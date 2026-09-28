@@ -24,7 +24,7 @@ Every script is independently versioned, so you can safely iterate on a script u
 | `id` | `string` | Unique identifier used in the loadstring URL (e.g., `abc123`). |
 | `name` | `string` | Human-readable name you give the script in the dashboard. |
 | `source` | `string` | The full Lua source code of the script. |
-| `url` | `string` | The public URL used to fetch the script for `loadstring` execution. |
+| `url` | `string` | The public URL used to fetch the script for `loadstring` execution (e.g., `https://scripthub.io/s/{id}`). |
 | `access` | `enum` | Either `public` or `private`. Controls who can fetch the script source. |
 | `createdAt` | `timestamp` | ISO 8601 timestamp recording when the script was first created. |
 | `updatedAt` | `timestamp` | ISO 8601 timestamp recording when the script was last saved. |

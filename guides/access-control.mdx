@@ -1,5 +1,5 @@
 ---
-title: "Control Who Can Execute Your ScriptHub Scripts"
+title: "Control Who Can Execute Your ScriptHub Lua Scripts"
 sidebarTitle: "Access Control"
 description: "Configure a script's access level to public or private, and use API tokens to secure access to private scripts in your Roblox games."
 ---
@@ -53,7 +53,7 @@ local response = HttpService:RequestAsync({
 if response.Success then
     loadstring(response.Body)()
 else
-    warn("[ScriptHub] Failed to load script: " .. response.StatusCode)
+    warn("[ScriptHub] Failed to load script: " .. tostring(response.StatusCode))
 end
 ```
 

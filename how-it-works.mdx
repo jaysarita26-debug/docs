@@ -1,7 +1,7 @@
 ---
 title: "How ScriptHub Works: loadstring Execution Explained"
 sidebarTitle: "How It Works"
-description: "Learn how ScriptHub serves your Lua scripts as raw text and how Roblox fetches and executes them at runtime via loadstring."
+description: "Learn how ScriptHub hosts your Lua scripts as raw text, how Roblox fetches them over HTTP, and how loadstring compiles and executes them at runtime."
 ---
 
 ScriptHub bridges the gap between your code editor and a running Roblox game by treating your Lua scripts as hosted text resources. You write a script in the ScriptHub dashboard, and ScriptHub exposes it at a stable URL as plain Lua source code. At runtime, your Roblox game fetches that source over HTTP, compiles it on the fly using `loadstring`, and executes it — all in a couple of lines of code. Here's exactly how each step works.
@@ -16,7 +16,7 @@ ScriptHub bridges the gap between your code editor and a running Roblox game by 
 
 Here's a robust pattern that handles the case where loading fails:
 
-```lua ScriptLoader.lua
+```lua
 local scriptUrl = "https://scripthub.io/s/abc123"
 local fn = loadstring(game:HttpGet(scriptUrl))
 if fn then

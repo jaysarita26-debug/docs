@@ -1,7 +1,7 @@
 ---
-title: "REST API Endpoints for Script Versions"
+title: "ScriptHub Versions API — List, Retrieve, and Restore"
 sidebarTitle: "Versions API"
-description: "List, retrieve, and restore script versions via the ScriptHub REST API. Includes full request and response examples."
+description: "List all versions of a hosted Lua script, retrieve full source for any version, and restore older versions via the ScriptHub REST API."
 ---
 
 The versions API gives you full access to a script's history. Every time you update a script's source code, ScriptHub automatically saves the previous source as a new version. You can list all versions, retrieve the source for any individual version, and restore an older version to make it the current one.
@@ -19,6 +19,11 @@ Returns a list of all saved versions for a script in reverse chronological order
 <ParamField path="id" type="string" required>
   The unique ID of the script whose versions you want to list.
 </ParamField>
+
+```bash List Versions
+curl -X GET https://api.scripthub.io/v1/scripts/abc123/versions \
+  -H "Authorization: Bearer sh_your_token"
+```
 
 ```json Response
 {
@@ -49,7 +54,22 @@ Retrieves the full Lua source code for a specific version of a script.
   The version number to retrieve.
 </ParamField>
 
-The response includes all version metadata plus the full `source` field for that version.
+```bash Get a Version
+curl -X GET https://api.scripthub.io/v1/scripts/abc123/versions/2 \
+  -H "Authorization: Bearer sh_your_token"
+```
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "version": 2,
+    "source": "-- Version 2 source\nprint(\"Hello from version 2\")",
+    "createdAt": "2024-01-18T09:00:00Z",
+    "message": null
+  }
+}
+```
 
 ---
 
@@ -74,7 +94,19 @@ curl -X POST https://api.scripthub.io/v1/scripts/abc123/versions/2/restore \
   -H "Authorization: Bearer sh_your_token"
 ```
 
-A successful request returns `201 Created` with the newly created version object in the `data` field.
+A successful request returns `201 Created` with the newly created version object in the `data` field:
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "version": 4,
+    "source": "-- Version 2 source\nprint(\"Hello from version 2\")",
+    "createdAt": "2024-01-22T11:00:00Z",
+    "message": "Restored from version 2"
+  }
+}
+```
 
 <Note>
   Restoring a version creates a new version — it does not delete intervening versions. Your full version history remains intact.

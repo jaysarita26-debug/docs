@@ -1,5 +1,5 @@
 ---
-title: "Authenticate with the ScriptHub API"
+title: "ScriptHub Authentication: API Tokens and Scopes Guide"
 sidebarTitle: "Authentication"
 description: "ScriptHub uses Bearer token authentication. Generate a token in the dashboard, then pass it in the Authorization header on every API request."
 ---
@@ -22,6 +22,49 @@ All ScriptHub API requests require a Bearer token obtained from your dashboard. 
     Copy the token immediately — it is only shown once. Store it somewhere safe, such as an environment variable or a secrets manager.
   </Step>
 </Steps>
+
+## POST /auth/token — Obtain an API Token Programmatically
+
+If you prefer to generate tokens via the API rather than the dashboard, use this endpoint. This is useful for automated workflows or build systems.
+
+**Request Body**
+
+<ParamField body="email" type="string" required>
+  The email address associated with your ScriptHub account.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  Your ScriptHub account password.
+</ParamField>
+
+<ParamField body="scopes" type="array" required>
+  An array of scope strings the token should be granted. See the [Token Scopes](#token-scopes) table below for valid values.
+</ParamField>
+
+```bash Generate Token via API
+curl -X POST https://api.scripthub.io/v1/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "you@example.com",
+    "password": "your_password",
+    "scopes": ["scripts:read", "scripts:write"]
+  }'
+```
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "token": "sh_live_abc123xyz",
+    "scopes": ["scripts:read", "scripts:write"],
+    "createdAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
+
+<Warning>
+  Sending credentials over the API to generate tokens is only appropriate in trusted server-side environments. Never call this endpoint from a Roblox game or client-side code.
+</Warning>
 
 ## Passing the Token
 

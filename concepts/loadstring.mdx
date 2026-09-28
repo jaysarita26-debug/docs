@@ -1,7 +1,7 @@
 ---
-title: "loadstring URLs: Execute Hosted Scripts in Roblox"
+title: "Loadstring URLs: Fetch and Execute Hosted Scripts in Roblox"
 sidebarTitle: "Loadstring URLs"
-description: "ScriptHub loadstring URLs serve your Lua scripts as plain text so Roblox can fetch and compile them at runtime using loadstring()."
+description: "ScriptHub loadstring URLs serve your Lua source as plain text so Roblox can fetch and compile it in your game at runtime with loadstring()."
 ---
 
 A ScriptHub loadstring URL is a plain-text HTTP endpoint that serves your hosted Lua source code. When Roblox calls `game:HttpGet()` with this URL, it receives the raw Lua source as a string. You then pass that string to `loadstring()` to compile and execute it inside your game at runtime. This pattern lets you update a script's behaviour centrally on ScriptHub without shipping a new Roblox game update.
@@ -61,3 +61,14 @@ If you need a game to pick up a new version immediately and deterministically, p
 <Tip>
   Pin a version with `?v=N` for production games to prevent unexpected breakage from script updates.
 </Tip>
+
+## Related Concepts
+
+<CardGroup cols={2}>
+  <Card title="Scripts" icon="file-code" href="/concepts/scripts">
+    Learn what a ScriptHub script is, how it is structured, and how its lifecycle works from creation to deletion.
+  </Card>
+  <Card title="Script Versions" icon="clock-rotate-left" href="/concepts/script-versions">
+    Understand how automatic versioning works, how to access previous versions, and how to roll back safely.
+  </Card>
+</CardGroup>

@@ -1,5 +1,5 @@
 ---
-title: "Script Version Control in ScriptHub"
+title: "Script Versions: History, Rollback, and Pinning in ScriptHub"
 sidebarTitle: "Versions"
 description: "Every time you save a script, ScriptHub creates a new version. You can view history, roll back to any version, and pin games to a specific version."
 ---
@@ -67,3 +67,14 @@ The response includes an array of version objects, each containing the version n
 <Tip>
   Use version pinning in production games and only update the version pin after testing the new script version in a private copy.
 </Tip>
+
+## Related Concepts
+
+<CardGroup cols={2}>
+  <Card title="Scripts" icon="file-code" href="/concepts/scripts">
+    Learn what a ScriptHub script is, how it is structured, and how its lifecycle works from creation to deletion.
+  </Card>
+  <Card title="Loadstring URLs" icon="link" href="/concepts/loadstring">
+    Learn how ScriptHub serves your Lua source over HTTP and how Roblox fetches and executes it at runtime.
+  </Card>
+</CardGroup>

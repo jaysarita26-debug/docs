@@ -1,7 +1,7 @@
 ---
-title: "REST API Endpoints for Script Management"
+title: "ScriptHub Scripts API — Create, Update, and Delete"
 sidebarTitle: "Scripts API"
-description: "Create, retrieve, update, and delete Lua scripts via the ScriptHub REST API. Includes full request and response examples."
+description: "Create, retrieve, update, and delete hosted Lua scripts via the ScriptHub REST API. Full request and response examples for all five endpoints."
 ---
 
 The scripts API lets you manage all your hosted Lua scripts programmatically. You can list scripts, create new ones, update their source or access settings, and permanently delete them — all using standard HTTP requests authenticated with your API token.
@@ -71,7 +71,23 @@ curl -X POST https://api.scripthub.io/v1/scripts \
   -d '{"name": "My Script", "source": "print(\"Hello from ScriptHub!\")" }'
 ```
 
-A successful request returns `201 Created` with the newly created script object in the `data` field.
+A successful request returns `201 Created` with the newly created script object in the `data` field:
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "id": "abc123",
+    "name": "My Script",
+    "source": "print(\"Hello from ScriptHub!\")",
+    "access": "public",
+    "latestVersion": 1,
+    "url": "https://scripthub.io/s/abc123",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
 
 ---
 
@@ -88,6 +104,27 @@ Retrieves a single script by its ID, including the full Lua source code.
 </ParamField>
 
 The response includes all script metadata plus a `source` field containing the current Lua source code.
+
+```bash Get Script
+curl -X GET https://api.scripthub.io/v1/scripts/abc123 \
+  -H "Authorization: Bearer sh_your_token"
+```
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "id": "abc123",
+    "name": "Infinite Jump",
+    "source": "-- Infinite jump script\nlocal UIS = game:GetService(\"UserInputService\")\nUIS.JumpRequest:Connect(function()\n  game.Players.LocalPlayer.Character.Humanoid:ChangeState(\"Jumping\")\nend)",
+    "access": "public",
+    "latestVersion": 3,
+    "url": "https://scripthub.io/s/abc123",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-20T14:30:00Z"
+  }
+}
+```
 
 ---
 
@@ -122,6 +159,24 @@ curl -X PUT https://api.scripthub.io/v1/scripts/abc123 \
   -H "Authorization: Bearer sh_your_token" \
   -H "Content-Type: application/json" \
   -d '{"source": "print(\"Updated!\")" }'
+```
+
+A successful request returns `200 OK` with the updated script object in the `data` field:
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "id": "abc123",
+    "name": "Infinite Jump",
+    "source": "print(\"Updated!\")",
+    "access": "public",
+    "latestVersion": 4,
+    "url": "https://scripthub.io/s/abc123",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-21T09:15:00Z"
+  }
+}
 ```
 
 ---
