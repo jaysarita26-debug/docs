@@ -1,0 +1,79 @@
+---
+title: "Troubleshoot ScriptHub Execution Errors in Roblox"
+sidebarTitle: "Common Errors"
+description: "Solutions to the most common ScriptHub errors including 404 script not found, 401 unauthorized, loadstring nil, and HttpService errors."
+---
+
+This page covers the most frequent errors developers encounter when using ScriptHub and how to fix them. Each entry describes the likely cause and the steps to resolve it so you can get back to a working game as quickly as possible.
+
+<Accordion title="Script not found (404)">
+  **Cause:** The script ID embedded in your loadstring URL is incorrect, or the script was deleted from your ScriptHub dashboard.
+
+  **Fix:**
+  1. Open your ScriptHub dashboard and navigate to the script you want to load.
+  2. Copy the URL directly from the script detail page — do not type it manually.
+  3. Replace the URL in your game code with the copied value.
+  4. If the script was deleted, recreate it from the dashboard. The new script will have a different ID, so update every place in your game code that references the old URL.
+</Accordion>
+
+<Accordion title="Unauthorized (401)">
+  **Cause:** You are attempting to fetch a private script without supplying a valid API token, or the token you are using has been revoked.
+
+  **Fix:**
+  1. Confirm the script's access is set to **Private** in the dashboard — a 401 on a public script indicates a different issue.
+  2. Ensure your request includes the `Authorization` header in the form `Bearer <token>`.
+  3. Check that the token has the `scripts:execute` scope. A token with only `scripts:read` cannot fetch private execution URLs.
+  4. If the token was recently revoked, generate a new one in **Dashboard > Settings > API Tokens** and update your game code.
+
+  See [Permissions](/configuration/permissions) for instructions on creating a correctly scoped token.
+</Accordion>
+
+<Accordion title="loadstring returned nil">
+  **Cause:** The source string passed to `loadstring` contains a Lua syntax error, or `game:HttpGet` returned an error page (HTML or JSON) instead of valid Lua source — for example, because the URL was wrong or the request was blocked.
+
+  **Fix:**
+  1. Print the raw response from `game:HttpGet` before passing it to `loadstring` so you can see exactly what was returned.
+  2. If the output is HTML or a JSON error object, the problem is in the URL or authorization, not the Lua itself — resolve that first.
+  3. If the output is Lua source, check it for syntax errors. The second return value of `loadstring` contains the error message.
+
+  Use this pattern to debug the issue:
+
+  ```lua
+  local source = game:HttpGet("https://scripthub.io/s/abc123")
+  print(source) -- inspect what was returned
+  local fn, err = loadstring(source)
+  if not fn then
+      warn("Syntax error: " .. err)
+  end
+  ```
+</Accordion>
+
+<Accordion title="Http requests are not enabled">
+  **Cause:** HttpService is disabled in your game's settings. Roblox blocks all outbound HTTP requests by default until you explicitly enable them.
+
+  **Fix:**
+  1. In Roblox Studio, open **File > Game Settings**.
+  2. Go to the **Security** tab.
+  3. Toggle **Allow HTTP Requests** to enabled.
+  4. Save and republish your game.
+
+  This setting must be enabled in every place file that calls `game:HttpGet` or `HttpService:GetAsync`.
+</Accordion>
+
+<Accordion title="loadstring is not enabled">
+  **Cause:** `loadstring` is not available in the current script context. It is disabled in ModuleScripts and in some executor environments that do not grant full Lua access.
+
+  **Fix:**
+  - Move your `loadstring` call into a **Script** (server-side) or **LocalScript** (client-side) context. It does not work inside a ModuleScript.
+  - If you are running in a Script, ensure the script has the `AllowFullAccess` flag set in its properties.
+  - Do not attempt to call `loadstring` from a ModuleScript — the function is intentionally unavailable there by Roblox's design.
+</Accordion>
+
+<Accordion title="Script is outdated / running old version">
+  **Cause:** ScriptHub's CDN may cache a previous version of your script for a short period after you publish an update. Games that fetch the script during this window receive the older source.
+
+  **Fix:**
+  - Wait approximately 60 seconds after publishing an update, then trigger a fresh execution. The CDN cache will have expired by then.
+  - To avoid this entirely, pin your loadstring URL to a specific version using the `?v=N` query parameter (for example, `https://scripthub.io/s/abc123?v=5`). Pinned URLs bypass the generic cache and always return the exact version you specified.
+  - When you are ready to roll out a new version, update the `?v=` value in your game code and republish.
+</Accordion>

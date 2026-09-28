@@ -1,0 +1,68 @@
+---
+title: "Scripts in ScriptHub: What They Are and How They Work"
+sidebarTitle: "Scripts"
+description: "A Script in ScriptHub is a hosted Lua file with a unique URL, version history, and configurable access control for Roblox execution."
+---
+
+A Script in ScriptHub is the core building block of the platform. When you create a script, ScriptHub hosts your Lua source code, assigns it a unique public URL, and automatically tracks every change you make through a built-in version history system. You control who can access it, and Roblox games can execute it at runtime using a simple `loadstring` call.
+
+## What Is a Script?
+
+A script is the fundamental unit of ScriptHub. Each script combines a human-readable name with a body of Lua source code and wraps it in a lightweight container that manages identity, access, and history. When you save a script, ScriptHub publishes it to a stable public URL and records a new version so that you can always refer back to — or roll back to — any previous state.
+
+Scripts support two access modes:
+
+- **Public** — anyone with the URL can fetch and execute the script.
+- **Private** — only authenticated requests from your account can retrieve the source.
+
+Every script is independently versioned, so you can safely iterate on a script used in multiple games without breaking existing integrations until you are ready to update them.
+
+## Script Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique identifier used in the loadstring URL (e.g., `abc123`). |
+| `name` | `string` | Human-readable name you give the script in the dashboard. |
+| `source` | `string` | The full Lua source code of the script. |
+| `url` | `string` | The public URL used to fetch the script for `loadstring` execution. |
+| `access` | `enum` | Either `public` or `private`. Controls who can fetch the script source. |
+| `createdAt` | `timestamp` | ISO 8601 timestamp recording when the script was first created. |
+| `updatedAt` | `timestamp` | ISO 8601 timestamp recording when the script was last saved. |
+| `latestVersion` | `integer` | The current version number, incremented on every save. |
+
+## Script Lifecycle
+
+Every script moves through a predictable lifecycle from the moment you create it to the point where it is no longer needed.
+
+<Steps>
+  <Step title="Created">
+    You create a script in the dashboard or via the API, give it a name, and write your initial Lua source. ScriptHub assigns it a unique `id`, generates a public URL, and records this initial save as **version 1**.
+  </Step>
+  <Step title="Edited">
+    Each time you save changes to a script's source code, ScriptHub records your edits and prepares a new version for publication. The `updatedAt` timestamp is refreshed on every save.
+  </Step>
+  <Step title="Versioned">
+    On save, ScriptHub creates an immutable snapshot of the source code and increments `latestVersion`. The new version immediately becomes the default served at the script's base URL, while all prior versions remain accessible via the `?v=` query parameter.
+  </Step>
+  <Step title="Executed">
+    Games and scripts running inside Roblox fetch the hosted source via `game:HttpGet()` and compile it at runtime using `loadstring()`. Scripts with `access` set to `public` are available to any caller; private scripts require authentication.
+  </Step>
+  <Step title="Deprecated / Deleted">
+    When a script is no longer needed, you can retire it gracefully by keeping it hosted (so existing games continue to work) or delete it permanently. Deletion immediately removes the source from ScriptHub's servers and invalidates the URL.
+  </Step>
+</Steps>
+
+<Note>
+  Deleting a script immediately invalidates its loadstring URL. Any games loading it will receive a 404 error.
+</Note>
+
+## Related Concepts
+
+<CardGroup cols={2}>
+  <Card title="Loadstring URLs" icon="link" href="/concepts/loadstring">
+    Learn how ScriptHub serves your Lua source over HTTP and how Roblox fetches and executes it at runtime.
+  </Card>
+  <Card title="Script Versions" icon="clock-rotate-left" href="/concepts/script-versions">
+    Understand how automatic versioning works, how to access previous versions, and how to roll back safely.
+  </Card>
+</CardGroup>

@@ -1,0 +1,77 @@
+---
+title: "Authenticate with the ScriptHub API"
+sidebarTitle: "Authentication"
+description: "ScriptHub uses Bearer token authentication. Generate a token in the dashboard, then pass it in the Authorization header on every API request."
+---
+
+All ScriptHub API requests require a Bearer token obtained from your dashboard. Tokens are scoped so you can grant only the permissions each integration needs. Keep your tokens secret — treat them with the same care as passwords.
+
+## Generating a Token
+
+<Steps>
+  <Step title="Log in to your dashboard">
+    Navigate to [scripthub.io/dashboard](https://scripthub.io/dashboard) and sign in to your account.
+  </Step>
+  <Step title="Open API Token settings">
+    Go to **Settings > API Tokens** in the left sidebar.
+  </Step>
+  <Step title="Create a new token">
+    Click **Generate New Token**, give it a descriptive name (for example, `ci-deploy` or `roblox-game`), and select the scopes your integration requires.
+  </Step>
+  <Step title="Copy your token">
+    Copy the token immediately — it is only shown once. Store it somewhere safe, such as an environment variable or a secrets manager.
+  </Step>
+</Steps>
+
+## Passing the Token
+
+Include the token in the `Authorization` header of every request:
+
+```bash Example Request
+curl -X GET https://api.scripthub.io/v1/scripts \
+  -H "Authorization: Bearer sh_your_token_here"
+```
+
+```typescript TypeScript Example
+const response = await fetch('https://api.scripthub.io/v1/scripts', {
+  headers: {
+    'Authorization': 'Bearer sh_your_token_here',
+    'Content-Type': 'application/json'
+  }
+});
+const data = await response.json();
+```
+
+## Token Scopes
+
+When generating a token, select only the scopes your use case requires. Narrowly scoped tokens limit the blast radius if a token is ever compromised.
+
+| Scope | Description |
+|-------|-------------|
+| `scripts:read` | Read script metadata and source |
+| `scripts:write` | Create, update, and delete scripts |
+| `scripts:execute` | Fetch private script loadstring content |
+| `versions:read` | List and view script versions |
+| `versions:write` | Restore versions |
+
+## Error Responses
+
+You will receive one of two authentication errors if a request cannot be authorized.
+
+**`401 Unauthorized`** — the `Authorization` header is missing, malformed, or contains an invalid token.
+
+**`403 Forbidden`** — the token is valid but does not have the scope required by the endpoint you called.
+
+```json 401 Response
+{
+  "success": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "No valid authentication token provided."
+  }
+}
+```
+
+<Warning>
+  Never expose API tokens in client-side code or public repositories. Use environment variables or a secrets manager to inject tokens at runtime.
+</Warning>

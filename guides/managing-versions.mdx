@@ -1,0 +1,60 @@
+---
+title: "Manage Script Versions and Roll Back Changes"
+sidebarTitle: "Manage Versions"
+description: "View your script's full version history in ScriptHub, compare versions, restore a previous version, and pin games to a specific version."
+---
+
+ScriptHub automatically versions every save, so you always have a complete history of your script's changes. You can browse that history, preview any past version, restore it with one click, and pin individual games to a specific version to protect them from future updates.
+
+## Viewing Version History
+
+<Steps>
+  <Step title="Open the Script">
+    From your dashboard, click the name of the script whose history you want to review.
+  </Step>
+  <Step title="Click the History Tab">
+    Inside the script editor, click the **History** tab. ScriptHub displays every saved version of the script.
+  </Step>
+  <Step title="Browse Versions">
+    Each entry in the list shows a version number and a timestamp indicating when that version was saved. Click any entry to preview its code in the right panel.
+  </Step>
+</Steps>
+
+## Restoring a Previous Version
+
+<Steps>
+  <Step title="Select a Version">
+    In the **History** tab, click the version you want to go back to. The code for that version loads in the right-hand preview panel.
+  </Step>
+  <Step title="Preview the Code">
+    Review the code in the preview panel to confirm it's the version you want to restore before committing.
+  </Step>
+  <Step title="Click Restore">
+    Click **Restore**. ScriptHub creates a new version containing the old code — your loadstring URL immediately serves the restored content.
+  </Step>
+</Steps>
+
+<Note>
+  Restoring doesn't delete the newer versions. It creates a new version with the old content, so your full history remains intact and you can always restore forward again if needed.
+</Note>
+
+## Pinning Games to a Version
+
+By default, your loadstring URL always serves the latest version of your script. To lock a specific game to a particular version, append the `?v=N` query parameter to your ScriptHub URL.
+
+```lua Pinned Version
+-- Always runs version 4, regardless of future updates
+loadstring(game:HttpGet("https://scripthub.io/s/abc123?v=4"))()
+```
+
+Replace `abc123` with your script's ID and `4` with the version number you want to pin to. ScriptHub will serve that exact version every time, even if you publish newer saves.
+
+## When to Pin vs. Float
+
+**Floating** (no `?v=` parameter) means your game always picks up the latest version of the script the moment you save. This is ideal during **development and testing**, where you want to iterate quickly without updating every game manually.
+
+**Pinning** means your game is locked to a specific, known-good version of the script. Use this in **production games** to prevent a bad update from breaking the experience for live players. When you're confident a new version is stable, update the pinned version number in your game's script.
+
+<Tip>
+  Test a new version in a private game before pointing your production game to it. This gives you a safe environment to validate changes without risking your live player base.
+</Tip>

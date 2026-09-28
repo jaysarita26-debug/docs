@@ -1,0 +1,50 @@
+---
+title: "ScriptHub FAQ: Common Questions Answered"
+sidebarTitle: "FAQ"
+description: "Answers to frequently asked questions about ScriptHub script hosting, loadstring execution, pricing, version control, and Roblox compatibility."
+---
+
+Quick answers to the most common questions about ScriptHub. If you don't find what you're looking for here, reach out to support at [support@scripthub.io](mailto:support@scripthub.io) or join the community Discord.
+
+<Accordion title="Is ScriptHub free to use?">
+  Yes. The free plan includes up to 10 hosted scripts and unlimited executions. Paid plans unlock additional hosted scripts, larger script size limits, team collaboration features, and priority support. You can compare plans on the ScriptHub pricing page.
+</Accordion>
+
+<Accordion title="Can I use ScriptHub with any Roblox game?">
+  Yes, as long as two conditions are met: HttpService must be enabled in **File > Game Settings > Security**, and the `loadstring` call must be made from a Script or LocalScript context — not a ModuleScript. Beyond those requirements, ScriptHub works with any Roblox experience regardless of genre or platform.
+</Accordion>
+
+<Accordion title="Is it safe to execute remote scripts?">
+  Only execute scripts that you wrote and host yourself on ScriptHub. Remote execution gives the loaded code the same permissions as the script that called `loadstring`, which means malicious code can do serious damage to your game or players' data. Never run scripts from unknown or untrusted sources, even if they are hosted on ScriptHub.
+</Accordion>
+
+<Accordion title="Can I collaborate with teammates?">
+  Yes. Team plans allow multiple members to view and manage the same scripts under a shared workspace. You can invite teammates and assign roles from **Settings > Team**. Each team member can generate their own API tokens scoped to the shared workspace.
+</Accordion>
+
+<Accordion title="What happens if I update a script in a live game?">
+  If you are using the base URL without a `?v=` version pin, your game will load the new version the next time it executes the loadstring call. Running game sessions that already loaded the previous version are not affected until they call loadstring again. If you want fine-grained control over when updates reach players, use version pinning — append `?v=N` to your URL and update the version number in your game code only when you are ready to ship the change.
+</Accordion>
+
+<Accordion title="Are scripts publicly visible?">
+  Only if you set them to **Public**. Public scripts can be fetched by anyone who knows the URL, with no authentication required. Private scripts require an API token with the `scripts:execute` scope to fetch. You can change a script's visibility at any time from its settings page in the dashboard.
+</Accordion>
+
+<Accordion title="Can I delete a version?">
+  No. Individual script versions are immutable and permanent — once a version is created it cannot be deleted on its own. This is by design so that version history remains a reliable audit trail. If you need to remove all versions, you can delete the entire script from the dashboard, which permanently removes the script and every version along with it. Its loadstring URL will immediately return a 404.
+</Accordion>
+
+<Accordion title="Does ScriptHub work in Roblox games on mobile?">
+  Yes. Roblox's HttpService operates at the engine level and works across all platforms, including iOS and Android mobile clients. No additional configuration is required for mobile compatibility beyond the standard HttpService and loadstring setup.
+</Accordion>
+
+<Accordion title="What is the maximum script size?">
+  Free plan accounts can host scripts up to **100 KB** per script. Paid plan accounts can host scripts up to **1 MB** per script. If your script exceeds the limit for your plan, consider splitting it into multiple scripts loaded in sequence, or upgrade your plan.
+</Accordion>
+
+<Accordion title="How do I get support?">
+  You have two options:
+
+  - **Email:** Send a message to [support@scripthub.io](mailto:support@scripthub.io). The support team aims to respond within one business day.
+  - **Community Discord:** Join the ScriptHub Discord server for faster community-driven help, announcements, and feature discussions. The invite link is available on the ScriptHub dashboard home page.
+</Accordion>

@@ -1,47 +1,71 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with ScriptHub in Under 5 Minutes"
+sidebarTitle: "Quickstart"
+description: "Create your first hosted Lua script, get your loadstring URL, and execute it inside Roblox in under 5 minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+This guide walks you through everything you need to go from a blank ScriptHub account to a hosted Lua script running live inside Roblox. By the time you finish, you'll have a script in the cloud, a `loadstring` URL to call it, and proof it executes — all in under 5 minutes.
 
 ## Prerequisites
 
-Before you begin, you must have:
+Before you begin, make sure you have the following:
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+- A free **ScriptHub account** — sign up at [scripthub.io](https://scripthub.io) if you don't have one yet.
+- **Roblox Studio** installed on your machine.
+- **HttpService enabled** in your Roblox game (Game Settings → Security → Allow HTTP Requests).
 
-## Get started
+## Steps
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Sign Up">
+    Go to [scripthub.io](https://scripthub.io) and click **Sign Up**. Fill in your email and password, then verify your email address. Once confirmed, you'll land on the ScriptHub dashboard.
+  </Step>
+  <Step title="Create Your First Script">
+    From the dashboard, click **New Script**. Give your script a name — for example, `HelloWorld` — then paste the following Lua code into the editor:
 
-    ```bash
-    npm install your-package
+    ```lua
+    -- HelloWorld.lua
+    print("Hello from ScriptHub!")
+    print("Script loaded at: " .. os.time())
+    ```
+
+    Click **Save**. ScriptHub stores your script and makes it available at a hosted URL immediately.
+  </Step>
+  <Step title="Copy Your loadstring URL">
+    After saving, open the script's detail page. You'll see a **Script URL** field containing a link in this format:
+
+    ```
+    https://scripthub.io/s/{scriptId}
+    ```
+
+    Click **Copy URL** to copy it to your clipboard. This URL always serves the latest saved version of your script.
+  </Step>
+  <Step title="Execute in Roblox">
+    Open Roblox Studio and create a new `LocalScript` (or `Script`) inside **StarterPlayerScripts** (or **ServerScriptService**). Delete any placeholder code, then paste the following — replacing the URL with your own:
+
+    ```lua
+    loadstring(game:HttpGet("https://scripthub.io/s/YOUR_SCRIPT_ID"))()
+    ```
+
+    Your file should look something like this when complete:
+
+    ```lua
+    -- LocalScript in StarterPlayerScripts
+    loadstring(game:HttpGet("https://scripthub.io/s/abc123"))()
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+  <Step title="Verify">
+    Press **Play** in Roblox Studio to run the game. Open the **Output** panel (View → Output). You should see:
 
-    ```bash
-    your-cli init
     ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+    Hello from ScriptHub!
+    Script loaded at: 1718000000
+    ```
 
-    ```bash
-    your-cli start
-    ```
+    If those lines appear, your script is running successfully from ScriptHub. Any future changes you save to the dashboard will be reflected the next time the game executes the `loadstring` call — no Studio republish needed.
   </Step>
 </Steps>
 
 <Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
-
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+  Enable HttpService in Game Settings → Security before executing remote scripts. Without it, `game:HttpGet()` will throw an error and your script will not load.
 </Tip>

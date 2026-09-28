@@ -1,0 +1,81 @@
+---
+title: "REST API Endpoints for Script Versions"
+sidebarTitle: "Versions API"
+description: "List, retrieve, and restore script versions via the ScriptHub REST API. Includes full request and response examples."
+---
+
+The versions API gives you full access to a script's history. Every time you update a script's source code, ScriptHub automatically saves the previous source as a new version. You can list all versions, retrieve the source for any individual version, and restore an older version to make it the current one.
+
+---
+
+## GET /scripts/:id/versions — List Versions
+
+Returns a list of all saved versions for a script in reverse chronological order.
+
+**Required scope:** `versions:read`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script whose versions you want to list.
+</ParamField>
+
+```json Response
+{
+  "success": true,
+  "data": [
+    { "version": 3, "createdAt": "2024-01-20T14:30:00Z", "message": "Fixed jump height" },
+    { "version": 2, "createdAt": "2024-01-18T09:00:00Z", "message": null },
+    { "version": 1, "createdAt": "2024-01-15T10:00:00Z", "message": null }
+  ]
+}
+```
+
+---
+
+## GET /scripts/:id/versions/:version — Get a Version
+
+Retrieves the full Lua source code for a specific version of a script.
+
+**Required scope:** `versions:read`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script.
+</ParamField>
+
+<ParamField path="version" type="integer" required>
+  The version number to retrieve.
+</ParamField>
+
+The response includes all version metadata plus the full `source` field for that version.
+
+---
+
+## POST /scripts/:id/versions/:version/restore — Restore a Version
+
+Restores a specific version by creating a new version whose source matches the one you specify. The script's `latestVersion` is updated to point to this newly created version.
+
+**Required scope:** `versions:write`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script to restore.
+</ParamField>
+
+<ParamField path="version" type="integer" required>
+  The version number whose source you want to restore.
+</ParamField>
+
+```bash Restore Version
+curl -X POST https://api.scripthub.io/v1/scripts/abc123/versions/2/restore \
+  -H "Authorization: Bearer sh_your_token"
+```
+
+A successful request returns `201 Created` with the newly created version object in the `data` field.
+
+<Note>
+  Restoring a version creates a new version — it does not delete intervening versions. Your full version history remains intact.
+</Note>

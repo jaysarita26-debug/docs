@@ -1,0 +1,80 @@
+---
+title: "Execute a ScriptHub Script in Your Roblox Game"
+sidebarTitle: "Execute Scripts"
+description: "Learn how to load and run a hosted ScriptHub Lua script inside Roblox using game:HttpGet and loadstring."
+---
+
+Once you have a ScriptHub URL, executing it in your Roblox game takes a single line of code. ScriptHub serves your Lua source over HTTPS, and Roblox's built-in `game:HttpGet` fetches it at runtime so your game always runs the latest version.
+
+## Requirements
+
+<Note>
+  Before executing a ScriptHub script, make sure the following prerequisites are in place:
+
+  - **HttpService must be enabled** in your game's settings (File > Game Settings > Security > Allow HTTP Requests).
+  - **The execution script must be a Script or LocalScript** — `loadstring` is not available inside ModuleScripts.
+</Note>
+
+## Basic Execution
+
+For most use cases, a single line is all you need. Replace `YOUR_SCRIPT_ID` with the ID from your ScriptHub URL.
+
+```lua Basic Execution
+loadstring(game:HttpGet("https://scripthub.io/s/YOUR_SCRIPT_ID"))()
+```
+
+This fetches the Lua source from ScriptHub and immediately compiles and runs it in the current script context.
+
+## Execution with Error Handling
+
+For production games, wrap execution in a `pcall` so that HTTP failures or compile errors don't silently crash your game.
+
+```lua Safe Execution
+local url = "https://scripthub.io/s/YOUR_SCRIPT_ID"
+local success, result = pcall(function()
+    local source = game:HttpGet(url)
+    local fn, err = loadstring(source)
+    if fn then
+        fn()
+    else
+        warn("[ScriptHub] Compile error: " .. tostring(err))
+    end
+end)
+if not success then
+    warn("[ScriptHub] HTTP error: " .. tostring(result))
+end
+```
+
+This pattern separates HTTP errors (network unreachable, non-200 status) from Lua compile errors, giving you precise feedback in the Output window.
+
+## Script vs. LocalScript
+
+Choose the right container depending on what your ScriptHub script needs to access.
+
+| Container | Runs On | Use When |
+|-----------|---------|----------|
+| **Script** | Server | Your code modifies server-side game state, manages datastores, or handles game logic that all players share. |
+| **LocalScript** | Client (each player) | Your code modifies the local player's character, UI, or input handling — such as the Infinite Jump example. |
+
+## Enabling HttpService
+
+If you haven't enabled HTTP requests in your game yet, follow these steps in Roblox Studio:
+
+<Steps>
+  <Step title="Open Game Settings">
+    In Roblox Studio, go to **File > Game Settings** from the top menu bar.
+  </Step>
+  <Step title="Go to the Security Tab">
+    In the Game Settings window, click the **Security** tab in the left sidebar.
+  </Step>
+  <Step title="Toggle Allow HTTP Requests">
+    Find the **Allow HTTP Requests** option and toggle it on.
+  </Step>
+  <Step title="Save">
+    Click **Save** to apply the change. Your game can now make outbound HTTP requests, including fetching scripts from ScriptHub.
+  </Step>
+</Steps>
+
+<Warning>
+  Only execute scripts from sources you control. Remote code loaded via `loadstring` has full access to your game's Roblox environment, including the ability to read datastores, modify server state, and interact with all connected players.
+</Warning>

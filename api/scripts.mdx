@@ -1,0 +1,151 @@
+---
+title: "REST API Endpoints for Script Management"
+sidebarTitle: "Scripts API"
+description: "Create, retrieve, update, and delete Lua scripts via the ScriptHub REST API. Includes full request and response examples."
+---
+
+The scripts API lets you manage all your hosted Lua scripts programmatically. You can list scripts, create new ones, update their source or access settings, and permanently delete them — all using standard HTTP requests authenticated with your API token.
+
+---
+
+## GET /scripts — List All Scripts
+
+Returns a paginated list of all scripts owned by the authenticated user.
+
+**Required scope:** `scripts:read`
+
+**Query Parameters**
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  Number of results per page. Defaults to `20`, maximum `100`.
+</ParamField>
+
+```json Response
+{
+  "success": true,
+  "data": [
+    {
+      "id": "abc123",
+      "name": "Infinite Jump",
+      "access": "public",
+      "latestVersion": 3,
+      "url": "https://scripthub.io/s/abc123",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T14:30:00Z"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 20, "total": 42 }
+}
+```
+
+---
+
+## POST /scripts — Create a Script
+
+Creates a new hosted Lua script under your account.
+
+**Required scope:** `scripts:write`
+
+**Request Body**
+
+<ParamField body="name" type="string" required>
+  A human-readable name for the script.
+</ParamField>
+
+<ParamField body="source" type="string" required>
+  The full Lua source code to host.
+</ParamField>
+
+<ParamField body="access" type="string">
+  Access level for the script. Accepted values: `"public"` or `"private"`. Defaults to `"public"`.
+</ParamField>
+
+```bash Create Script
+curl -X POST https://api.scripthub.io/v1/scripts \
+  -H "Authorization: Bearer sh_your_token" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My Script", "source": "print(\"Hello from ScriptHub!\")" }'
+```
+
+A successful request returns `201 Created` with the newly created script object in the `data` field.
+
+---
+
+## GET /scripts/:id — Get a Script
+
+Retrieves a single script by its ID, including the full Lua source code.
+
+**Required scope:** `scripts:read`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script to retrieve.
+</ParamField>
+
+The response includes all script metadata plus a `source` field containing the current Lua source code.
+
+---
+
+## PUT /scripts/:id — Update a Script
+
+Updates one or more fields on an existing script. When you change the `source` field, a new version is automatically created and the previous source is preserved in version history.
+
+**Required scope:** `scripts:write`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script to update.
+</ParamField>
+
+**Request Body**
+
+<ParamField body="name" type="string">
+  New name for the script.
+</ParamField>
+
+<ParamField body="source" type="string">
+  Updated Lua source code. Triggers a new version.
+</ParamField>
+
+<ParamField body="access" type="string">
+  Updated access level. Accepted values: `"public"` or `"private"`.
+</ParamField>
+
+```bash Update Script
+curl -X PUT https://api.scripthub.io/v1/scripts/abc123 \
+  -H "Authorization: Bearer sh_your_token" \
+  -H "Content-Type: application/json" \
+  -d '{"source": "print(\"Updated!\")" }'
+```
+
+---
+
+## DELETE /scripts/:id — Delete a Script
+
+Permanently deletes a script and all of its version history.
+
+**Required scope:** `scripts:write`
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script to delete.
+</ParamField>
+
+<Warning>
+  Deleting a script permanently removes it and invalidates its loadstring URL. Any Roblox scripts that reference the loadstring URL will stop working immediately.
+</Warning>
+
+A successful request returns `200 OK`:
+
+```json Response
+{
+  "success": true
+}
+```

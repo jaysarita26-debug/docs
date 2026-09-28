@@ -1,0 +1,57 @@
+---
+title: "Create and Host a Lua Script on ScriptHub"
+sidebarTitle: "Create a Script"
+description: "Learn how to create, name, and publish a Lua script on ScriptHub so it's instantly accessible via a loadstring URL."
+---
+
+Creating a script on ScriptHub takes under a minute. Once you save, ScriptHub generates a permanent loadstring URL that you can drop straight into any Roblox game — no extra hosting or configuration required.
+
+<Steps>
+  <Step title="Open the Dashboard">
+    Log in to your account and navigate to [scripthub.io/dashboard](https://scripthub.io/dashboard). All of your existing scripts are listed here, and it's where you'll manage everything going forward.
+  </Step>
+  <Step title="Click New Script">
+    Click the orange **+ New Script** button in the top-right corner of the dashboard. A blank script editor will open immediately.
+  </Step>
+  <Step title="Name Your Script">
+    Give your script a clear, descriptive name so you can find it easily later. For example, use a name like **"Infinite Jump"** rather than something generic like "Script 1". The name appears in your dashboard list and in API responses.
+  </Step>
+  <Step title="Write Your Code">
+    Paste or type your Lua source code directly into the editor. The editor supports full Lua 5.1 syntax compatible with the Roblox environment.
+
+    ```lua Example: Infinite Jump
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.JumpRequest:Connect(function()
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end)
+    ```
+  </Step>
+  <Step title="Save the Script">
+    Click **Save**. ScriptHub creates version 1 of your script and immediately generates a unique loadstring URL for it.
+  </Step>
+  <Step title="Copy the URL">
+    Your script's URL appears directly beneath the script name:
+
+    ```
+    https://scripthub.io/s/{id}
+    ```
+
+    Copy this URL and use it in your Roblox game to fetch and execute the script at runtime.
+  </Step>
+</Steps>
+
+<Note>
+  Scripts are saved as version 1 on first save. Every subsequent save creates a new version. Your loadstring URL always points to the latest version unless you pin it to a specific one.
+</Note>
+
+## Editing an Existing Script
+
+To update a script you've already published, open it from your dashboard list by clicking its name. Make your changes in the editor, then click **Save**. ScriptHub creates a new version automatically — your URL stays the same and immediately serves the updated code.
+
+<Tip>
+  Keep your script names descriptive — they appear in the dashboard list and in API responses, making it much easier to manage a large library of scripts.
+</Tip>

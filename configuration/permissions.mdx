@@ -1,0 +1,67 @@
+---
+title: "ScriptHub Permissions and API Token Management"
+sidebarTitle: "Permissions"
+description: "Create, scope, and revoke ScriptHub API tokens to control access to your scripts and the management API."
+---
+
+ScriptHub uses API tokens to authenticate both the management API and private script execution. You can create multiple tokens with different scopes, allowing you to grant each game or service only the access it actually needs. Tokens are bearer credentials — whoever holds a token can exercise its scopes — so treat them with the same care as passwords.
+
+## Token Scopes
+
+When you generate a token, you select one or more scopes that define exactly what that token is allowed to do. Requests made with a token are rejected if they require a scope the token does not have.
+
+| Scope | Description |
+|---|---|
+| `scripts:read` | Read script metadata and source |
+| `scripts:write` | Create, update, and delete scripts |
+| `scripts:execute` | Fetch private script URLs for loadstring execution |
+| `versions:read` | List and retrieve script versions |
+| `versions:write` | Restore versions |
+
+## Creating a Token
+
+<Steps>
+  <Step title="Open API Tokens settings">
+    Go to **Dashboard > Settings > API Tokens**.
+  </Step>
+  <Step title="Start token generation">
+    Click **Generate New Token**.
+  </Step>
+  <Step title="Name your token">
+    Enter a descriptive name such as `Production Game Token` so you can identify it later in the token list.
+  </Step>
+  <Step title="Select scopes">
+    Check the scopes you need. Grant only the minimum scopes required for the token's intended use.
+  </Step>
+  <Step title="Generate the token">
+    Click **Generate**. ScriptHub creates the token and displays it once.
+  </Step>
+  <Step title="Copy and store the token">
+    Copy the token immediately and store it in a secure location such as a secrets manager or environment variable store.
+  </Step>
+</Steps>
+
+<Warning>
+  Store your token securely. ScriptHub cannot show it again after creation. If you lose it, revoke the old token and generate a new one.
+</Warning>
+
+## Revoking a Token
+
+Revoke a token when you no longer need it, when a team member who had access leaves, or if you suspect it has been compromised.
+
+1. Go to **Dashboard > Settings > API Tokens**.
+2. Find the token you want to revoke in the list.
+3. Click **Revoke** next to that token, then confirm the action.
+
+<Note>
+  Revoking a token immediately invalidates it. Any games or services using it will receive 401 errors until you update them with a replacement token.
+</Note>
+
+## Best Practices
+
+Following these practices reduces the risk of unauthorized access to your scripts:
+
+- **Use one token per game.** Separate tokens let you revoke access for one game without affecting others.
+- **Use the minimum required scopes.** A game that only needs to fetch private scripts should have `scripts:execute` only — not `scripts:write`.
+- **Rotate tokens regularly.** Replace tokens on a schedule (for example, every 90 days) to limit the window of exposure if a token is ever leaked.
+- **Never expose tokens in client-side code.** Tokens placed in LocalScripts are visible to anyone who decompiles the game. Always call authenticated endpoints from server-side Scripts.

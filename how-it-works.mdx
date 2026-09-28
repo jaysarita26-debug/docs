@@ -1,0 +1,43 @@
+---
+title: "How ScriptHub Works: loadstring Execution Explained"
+sidebarTitle: "How It Works"
+description: "Learn how ScriptHub serves your Lua scripts as raw text and how Roblox fetches and executes them at runtime via loadstring."
+---
+
+ScriptHub bridges the gap between your code editor and a running Roblox game by treating your Lua scripts as hosted text resources. You write a script in the ScriptHub dashboard, and ScriptHub exposes it at a stable URL as plain Lua source code. At runtime, your Roblox game fetches that source over HTTP, compiles it on the fly using `loadstring`, and executes it — all in a couple of lines of code. Here's exactly how each step works.
+
+## The Execution Flow
+
+1. **You write and save a Lua script in the ScriptHub dashboard.** The editor accepts any valid Lua code. When you hit Save, ScriptHub stores the latest version and marks it as the active revision served at your script's URL.
+2. **ScriptHub assigns a unique URL to your script.** Every script gets a permanent endpoint in the format `https://scripthub.io/s/{scriptId}`. This URL always returns the most recently saved version as raw plain text.
+3. **Your Roblox game calls `game:HttpGet(url)` to fetch the raw Lua source.** Roblox's HttpService makes an outbound GET request to the ScriptHub URL and returns the response body as a string — which is your Lua code, verbatim.
+4. **`loadstring()` compiles the source into a Lua function.** Roblox's `loadstring` built-in takes the raw source string, parses it, and returns a callable Lua function. If the source contains a syntax error, `loadstring` returns `nil` and an error message instead.
+5. **Calling `()` on the result executes the script in your game's context.** The compiled function runs with the same environment as the script that called it, giving it access to Roblox services, variables in scope, and the full Lua standard library available in that context.
+
+Here's a robust pattern that handles the case where loading fails:
+
+```lua ScriptLoader.lua
+local scriptUrl = "https://scripthub.io/s/abc123"
+local fn = loadstring(game:HttpGet(scriptUrl))
+if fn then
+    fn()
+else
+    warn("Failed to load script")
+end
+```
+
+This approach lets your game degrade gracefully — logging a warning instead of throwing an unhandled error — if the script URL is unreachable or returns malformed code.
+
+## Why Use Remote Scripts?
+
+- **Update without republishing.** Save a new version on the ScriptHub dashboard and every game that fetches your script picks it up on the next load. No Roblox publish cycle, no waiting for moderation.
+- **Centralize multi-game code.** Share a single script across several games. Fix a bug or add a feature once, and all your games benefit simultaneously.
+- **Quick iteration.** Test changes live in Roblox Studio immediately after saving — the feedback loop shrinks from minutes to seconds, making experimentation much cheaper.
+
+<Warning>
+  Only load scripts from sources you trust. Executing untrusted Lua code is a security risk — a malicious script runs with full access to your game's environment and can manipulate game state, steal data, or harm players' experiences.
+</Warning>
+
+<Note>
+  `loadstring` is only available in LocalScript and Script contexts, not ModuleScripts. If you need to use remote code in a ModuleScript, load it from a Script or LocalScript and pass the results through the module's return value.
+</Note>

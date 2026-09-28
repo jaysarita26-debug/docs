@@ -1,0 +1,43 @@
+---
+title: "ScriptHub Account and Script Settings"
+sidebarTitle: "Settings"
+description: "Configure your ScriptHub account preferences, script defaults, and notification settings from the dashboard."
+---
+
+The ScriptHub dashboard settings panel lets you control account-level preferences and default behavior for new scripts. You can update your profile details, manage API tokens, configure what happens when you publish a new script, and choose which events trigger email notifications — all from a single location.
+
+## Account Settings
+
+Your account settings control your identity and credentials on ScriptHub. Navigate to **Dashboard > Settings > Account** to manage the following:
+
+- **Display Name** — Shown in the dashboard and included in API responses where your authorship is referenced. Update it at any time without affecting your login credentials.
+- **Email** — Used to log in to ScriptHub and to receive notification emails. Changing your email requires a confirmation link sent to the new address.
+- **Password** — Change your password from Account Settings. ScriptHub will ask for your current password before accepting a new one.
+- **API Tokens** — Generate and revoke tokens for programmatic access to the management API and private script URLs. See [Permissions](/configuration/permissions) for full details on token scopes.
+
+## Script Defaults
+
+Script defaults let you define the starting configuration applied to every new script you create. These settings save time when you have a consistent workflow.
+
+- **Default Access** — Choose **Public** or **Private** as the default visibility for new scripts. Public scripts are accessible to anyone with the URL. Private scripts require an API token with the `scripts:execute` scope to fetch.
+- **Default Version Behavior** — Control whether a newly updated script automatically serves the latest version to all callers, or whether you must perform a manual version bump before the new source goes live. Setting this to **Manual** gives you a staging window to test changes before they reach running games.
+
+<Note>
+  Changes to script defaults only apply to newly created scripts. Existing scripts retain their individual settings.
+</Note>
+
+## Notifications
+
+ScriptHub can send email notifications to keep you informed about important events. Navigate to **Settings > Notifications** to toggle each type individually:
+
+- **Script execution errors** — Receive an email when a monitored script encounters a server-side execution error. Requires monitoring to be enabled on the script.
+- **API token usage alerts** — Get notified when a token exceeds a usage threshold or is used from an unfamiliar IP address.
+- **Version rollback events** — Receive a confirmation email whenever a script version is rolled back, whether triggered manually or by an automated rule.
+
+Toggle each notification type on or off from **Settings > Notifications**. Changes take effect immediately.
+
+## Deleting Your Account
+
+Account deletion is permanent and cannot be undone. Deleting your account removes all of your hosted scripts, their loadstring URLs, all version history, and all API tokens. Any Roblox games currently calling your script URLs will stop working immediately.
+
+If you want to remove your account, contact ScriptHub support before proceeding to ensure you have exported anything you need. Reach the support team at [support@scripthub.io](mailto:support@scripthub.io).

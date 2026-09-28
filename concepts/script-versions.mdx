@@ -1,0 +1,69 @@
+---
+title: "Script Version Control in ScriptHub"
+sidebarTitle: "Versions"
+description: "Every time you save a script, ScriptHub creates a new version. You can view history, roll back to any version, and pin games to a specific version."
+---
+
+Every time you save a script in ScriptHub, the platform automatically creates a new, immutable version of that script. There is nothing extra to configure — versioning is always on. This gives you a complete, permanent history of every change you have ever made, the ability to roll back to any prior state with a single click, and the confidence to iterate quickly knowing that production games pinned to an older version will never be affected by your edits until you decide otherwise.
+
+## How Versioning Works
+
+ScriptHub's versioning model is intentionally simple and non-destructive.
+
+- **Every save creates a new immutable version.** When you save a script, ScriptHub snapshots the current source code and assigns it the next sequential version number — `v1`, `v2`, `v3`, and so on. That snapshot can never be overwritten or altered.
+- **The latest version is served by default.** A request to the base URL (`https://scripthub.io/s/{scriptId}`) always returns the source from the most recently published version. The `latestVersion` property on the script object reflects this number.
+- **Previous versions are permanently accessible.** You can fetch any earlier version at any time by appending `?v=N` to the URL. These versioned URLs are stable forever — they will never return different content or a 404.
+- **Versions are never deleted when you update a script.** Saving a new version does not remove or overwrite older versions. Deletion of individual versions is not supported; only deleting the entire script removes its history.
+
+## Accessing a Specific Version
+
+Append `?v=N` to the script's loadstring URL to request a precise version. Replace `N` with the integer version number you want to target.
+
+```
+https://scripthub.io/s/{scriptId}?v={version}
+```
+
+For example, to lock a game to version 5 of script `abc123`:
+
+```lua Pin to Version 5
+loadstring(game:HttpGet("https://scripthub.io/s/abc123?v=5"))()
+```
+
+This call will always return the source as it existed when version 5 was saved, regardless of how many newer versions you have published since then.
+
+## Rolling Back
+
+Rolling back promotes an older version to become the new latest version without altering any of the existing version history.
+
+<Steps>
+  <Step title="Open the script in the dashboard">
+    Navigate to your script list and click the script you want to roll back.
+  </Step>
+  <Step title="Go to the History tab">
+    Inside the script editor, select the **History** tab. You will see a chronological list of all saved versions with their version numbers, save timestamps, and optional commit messages.
+  </Step>
+  <Step title="Preview the version">
+    Click any version in the list to load its source into the read-only preview panel. Confirm this is the state you want to restore.
+  </Step>
+  <Step title="Click Restore">
+    Click the **Restore** button next to the previewed version. ScriptHub creates a new version (e.g., `v7`) whose source is identical to the version you selected (e.g., `v3`). The base URL immediately begins serving the restored source, and `latestVersion` is updated accordingly.
+  </Step>
+</Steps>
+
+<Info>
+  A rollback always creates a new version entry rather than reverting in place. This preserves a complete audit trail — you can always see that a rollback occurred and when.
+</Info>
+
+## Version History in the API
+
+You can retrieve the full version list for any script programmatically. Send a `GET` request to:
+
+```
+GET /api/scripts/:id/versions
+```
+
+The response includes an array of version objects, each containing the version number, `createdAt` timestamp, and a content hash. For the complete request and response schema, including filtering and pagination options, see the [Versions API reference](/api/versions).
+
+<Tip>
+  Use version pinning in production games and only update the version pin after testing the new script version in a private copy.
+</Tip>

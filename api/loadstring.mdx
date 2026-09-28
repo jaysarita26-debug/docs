@@ -1,0 +1,71 @@
+---
+title: "GET /s/:id — Fetch Script for Loadstring Execution"
+sidebarTitle: "Loadstring Endpoint"
+description: "Serve the raw Lua source of a ScriptHub script for use with loadstring() in Roblox. Supports version pinning via the ?v= query parameter."
+---
+
+The loadstring endpoint serves your script's raw Lua source as plain text, suitable for use with Roblox's `loadstring()` and `game:HttpGet()`. Public scripts are accessible without any credentials, while private scripts require a Bearer token with the `scripts:execute` scope.
+
+## Endpoint
+
+```
+GET https://scripthub.io/s/:id
+GET https://scripthub.io/s/:id?v={version}
+```
+
+## Path & Query Parameters
+
+<ParamField path="id" type="string" required>
+  The unique ID of the script to serve.
+</ParamField>
+
+<ParamField query="v" type="integer">
+  The version number to serve. Omit this parameter to always receive the latest published version.
+</ParamField>
+
+## Authentication
+
+**Public scripts** can be fetched without any authentication. No token or header is required.
+
+**Private scripts** require a Bearer token passed in the `Authorization` header. The token must have the `scripts:execute` scope:
+
+```
+Authorization: Bearer sh_your_token_here
+```
+
+## Response
+
+On success, the endpoint returns the raw Lua source code as plain text with a `Content-Type: text/plain` header. There is no JSON envelope — the body is the script itself, ready to be passed directly to `loadstring()`.
+
+## Usage in Roblox
+
+Use `game:HttpGet()` to fetch a public script and execute it in one line:
+
+```lua Public Script
+-- Public script — no auth needed
+loadstring(game:HttpGet("https://scripthub.io/s/abc123"))()
+```
+
+For private scripts, use `HttpService:RequestAsync()` to attach the `Authorization` header before executing the response body:
+
+```lua Private Script
+local HttpService = game:GetService("HttpService")
+local res = HttpService:RequestAsync({
+    Url = "https://scripthub.io/s/abc123",
+    Method = "GET",
+    Headers = { ["Authorization"] = "Bearer sh_tok" }
+})
+if res.Success then loadstring(res.Body)() end
+```
+
+<Tip>
+  Pin a specific version with the `?v=` parameter to prevent unexpected behavior when you publish updates. For example: `https://scripthub.io/s/abc123?v=2`
+</Tip>
+
+## Error Responses
+
+| Code | Meaning |
+|------|---------|
+| 404 | Script not found or deleted |
+| 401 | Private script — missing or invalid token |
+| 403 | Valid token, missing `scripts:execute` scope |

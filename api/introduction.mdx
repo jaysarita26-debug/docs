@@ -1,0 +1,80 @@
+---
+title: "ScriptHub REST API Overview"
+sidebarTitle: "Overview"
+description: "The ScriptHub REST API lets you programmatically create, update, and manage Lua scripts and their version history."
+---
+
+The ScriptHub REST API provides programmatic access to all the same features available in the dashboard. You can create and update scripts, manage version history, control access permissions, and fetch raw Lua source for loadstring execution — all from your own tooling, CI pipelines, or applications.
+
+## Base URL
+
+All API requests are made to the following base URL:
+
+```
+https://api.scripthub.io/v1
+```
+
+## Authentication
+
+All endpoints require a Bearer token passed in the `Authorization` header:
+
+```bash
+Authorization: Bearer sh_your_token_here
+```
+
+See the [Authentication guide](/api/authentication) for full details on generating tokens and managing scopes.
+
+## Request Format
+
+All request bodies must be JSON. Set the `Content-Type` header on every request that includes a body:
+
+```
+Content-Type: application/json
+```
+
+## Response Format
+
+All responses return JSON. Every response is wrapped in a standard envelope that includes a `success` boolean so you can consistently detect errors before inspecting the payload.
+
+```json Success Response
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+```json Error Response
+{
+  "success": false,
+  "error": {
+    "code": "SCRIPT_NOT_FOUND",
+    "message": "No script with that ID exists."
+  }
+}
+```
+
+## HTTP Status Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request — invalid parameters |
+| 401 | Unauthorized — missing or invalid token |
+| 403 | Forbidden — token lacks required scope |
+| 404 | Not Found |
+| 429 | Rate Limited |
+| 500 | Server Error |
+
+## Rate Limiting
+
+Free accounts are limited to **100 requests per minute**. Paid plans receive **1,000 requests per minute**. Check the `X-RateLimit-Remaining` response header to see how much of your quota remains for the current window.
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api/authentication">
+    Learn how to generate API tokens and pass them in your requests.
+  </Card>
+  <Card title="Scripts API" icon="code" href="/api/scripts">
+    Create, retrieve, update, and delete your hosted Lua scripts.
+  </Card>
+</CardGroup>

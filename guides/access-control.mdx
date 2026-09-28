@@ -1,0 +1,68 @@
+---
+title: "Control Who Can Execute Your ScriptHub Scripts"
+sidebarTitle: "Access Control"
+description: "Configure a script's access level to public or private, and use API tokens to secure access to private scripts in your Roblox games."
+---
+
+ScriptHub lets you keep scripts private so only authorized callers can fetch and execute them. Whether you're building an internal tool or a commercial game, access control ensures your Lua code doesn't fall into the wrong hands.
+
+## Access Levels
+
+ScriptHub supports two access levels for every script.
+
+| Level | Description |
+|-------|-------------|
+| **Public** | Anyone with the URL can fetch and execute the script. No authentication is required. |
+| **Private** | Only callers presenting a valid API token can fetch the script. Unauthenticated requests receive a `401 Unauthorized` response. |
+
+## Setting Access Level
+
+<Steps>
+  <Step title="Open the Script">
+    From your dashboard, click the name of the script you want to configure.
+  </Step>
+  <Step title="Click Settings">
+    Inside the script editor, click the **Settings** tab.
+  </Step>
+  <Step title="Choose an Access Level">
+    Under the **Access** section, select either **Public** or **Private**.
+  </Step>
+  <Step title="Save Settings">
+    Click **Save Settings** to apply the change immediately. Private scripts will reject any request that doesn't include a valid API token from this point forward.
+  </Step>
+</Steps>
+
+## Executing Private Scripts
+
+Private scripts require an API token passed as a `Bearer` token in the `Authorization` header. Because Roblox's shorthand `game:HttpGet` doesn't support custom headers, use `HttpService:RequestAsync` instead.
+
+```lua Private Script Execution
+local HttpService = game:GetService("HttpService")
+local url = "https://scripthub.io/s/YOUR_PRIVATE_SCRIPT_ID"
+local token = "sh_your_api_token_here"
+
+-- Use HttpService.RequestAsync for custom headers
+local response = HttpService:RequestAsync({
+    Url = url,
+    Method = "GET",
+    Headers = {
+        ["Authorization"] = "Bearer " .. token
+    }
+})
+
+if response.Success then
+    loadstring(response.Body)()
+else
+    warn("[ScriptHub] Failed to load script: " .. response.StatusCode)
+end
+```
+
+Replace `YOUR_PRIVATE_SCRIPT_ID` with your script's ID and `sh_your_api_token_here` with a token generated in your ScriptHub account settings.
+
+<Warning>
+  Never hardcode API tokens in client-side LocalScripts — they are visible to players who inspect the game's memory or use exploit tools. Always fetch and execute private scripts from a server-side **Script**, or retrieve the token from a secure server endpoint rather than embedding it directly.
+</Warning>
+
+<Tip>
+  Create a dedicated token with minimal permissions for each game. That way, if a token is compromised, you can revoke it without affecting your other games or scripts.
+</Tip>

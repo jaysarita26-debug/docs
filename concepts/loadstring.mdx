@@ -1,0 +1,63 @@
+---
+title: "loadstring URLs: Execute Hosted Scripts in Roblox"
+sidebarTitle: "Loadstring URLs"
+description: "ScriptHub loadstring URLs serve your Lua scripts as plain text so Roblox can fetch and compile them at runtime using loadstring()."
+---
+
+A ScriptHub loadstring URL is a plain-text HTTP endpoint that serves your hosted Lua source code. When Roblox calls `game:HttpGet()` with this URL, it receives the raw Lua source as a string. You then pass that string to `loadstring()` to compile and execute it inside your game at runtime. This pattern lets you update a script's behaviour centrally on ScriptHub without shipping a new Roblox game update.
+
+## URL Format
+
+ScriptHub exposes two URL patterns for fetching a script's source:
+
+```
+https://scripthub.io/s/{scriptId}
+https://scripthub.io/s/{scriptId}?v={version}
+```
+
+| Part | Description |
+|---|---|
+| `https://scripthub.io/s/` | The base URL for all script endpoints. Every hosted script is served under this path. |
+| `{scriptId}` | The unique identifier assigned to your script when it was created. You can find this in the dashboard or in any API response for that script. |
+| `?v={version}` | An optional query parameter that pins the request to a specific version number (e.g., `?v=3`). When omitted, ScriptHub always returns the latest published version. |
+
+## Usage in Roblox
+
+Use `game:HttpGet()` inside a `Script` or `LocalScript` to fetch the source, then immediately invoke the result of `loadstring()`. The parentheses at the end of the call are what actually run the compiled function.
+
+**Basic usage** — always fetches the latest version:
+
+```lua Basic Usage
+loadstring(game:HttpGet("https://scripthub.io/s/abc123"))()
+```
+
+**Pinned version** — locks execution to a specific version regardless of future updates:
+
+```lua Pinned Version
+loadstring(game:HttpGet("https://scripthub.io/s/abc123?v=3"))()
+```
+
+**With error handling** — wraps execution in `pcall` so a runtime error in the remote script does not silently crash your game:
+
+```lua With Error Handling
+local ok, err = pcall(function()
+    loadstring(game:HttpGet("https://scripthub.io/s/abc123"))()
+end)
+if not ok then
+    warn("Script error: " .. err)
+end
+```
+
+## Caching
+
+ScriptHub always serves the most recent version of your script at the base URL unless you append a `?v=` parameter. However, ScriptHub's CDN layer may cache a version for a short period after you publish an update. In practice this means there can be a brief delay — typically under sixty seconds — before all regions serve the newly published source.
+
+If you need a game to pick up a new version immediately and deterministically, pin the URL to the new version number with `?v=N`. Pinned version URLs are immutable and are never affected by caching delays because the response for a given `scriptId` and version number never changes.
+
+<Warning>
+  `loadstring` is disabled in some executor environments. Ensure your game's HttpService and execution context support it.
+</Warning>
+
+<Tip>
+  Pin a version with `?v=N` for production games to prevent unexpected breakage from script updates.
+</Tip>
